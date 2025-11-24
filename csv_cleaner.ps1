@@ -16,7 +16,7 @@ function Normalize-ADString {
     return $clean
 }
 
-$data = Import-Csv $inputFile -Delimiter ";"
+$data = Import-Csv $inputFile -Delimiter ";" -Encoding Default
 
 # Nettoyage de chaque colonne
 $cleaned = foreach ($row in $data) {
