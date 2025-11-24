@@ -22,7 +22,8 @@ $data = Import-Csv $inputFile -Delimiter ";" -Encoding Default
 $cleaned = foreach ($row in $data) {
     $newRow = [ordered]@{}
     foreach ($col in $row.PSObject.Properties.Name) {
-        $newRow[$col] = Normalize-ADString $row.$col
+        $cleanColName = Normalize-ADString $col
+        $newRow[$cleanColName] = Normalize-ADString $row.$col
     }
     [PSCustomObject]$newRow
 }
