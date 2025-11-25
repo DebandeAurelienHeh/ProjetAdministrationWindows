@@ -1,6 +1,5 @@
-# ============================================
 # VARIABLES DE CONFIGURATION
-# ============================================
+
 $CSVPath = "C:\chemin\vers\utilisateurs.csv"
 $Domain = "espagne.lan"
 $BaseOU = "OU=Utilisateurs,DC=espagne,DC=lan"
@@ -8,9 +7,9 @@ $PasswordExportPath = "C:\chemin\vers\passwords_export.csv"
 $LogPath = "C:\chemin\vers\creation_users.log"
 $PasswordLength = 10
 
-# ============================================
-# FONCTION : GENERATION MOT DE PASSE COMPLEXE
-# ============================================
+
+# GENERATION MOT DE PASSE
+
 function Generate-ComplexPassword {
     param([int]$Length = 10)
     
@@ -38,9 +37,8 @@ function Generate-ComplexPassword {
     return -join $Password
 }
 
-# ============================================
-# FONCTION : CONVERTIR PRENOM EN INITIALES
-# ============================================
+# CONVERTIR PRENOM EN INITIALES
+
 function Convert-PrenomToInitials {
     param([string]$Prenom)
     
@@ -57,9 +55,8 @@ function Convert-PrenomToInitials {
     }
 }
 
-# ============================================
-# FONCTION : ECRIRE DANS LE LOG
-# ============================================
+# ECRIRE DANS LE LOG
+
 function Write-Log {
     param(
         [string]$Message,
@@ -78,9 +75,8 @@ function Write-Log {
     }
 }
 
-# ============================================
 # DEBUT DU SCRIPT
-# ============================================
+
 Write-Log "=== DEBUT DE LA CREATION DES UTILISATEURS ===" "INFO"
 
 # Vérifier que le module Active Directory est chargé
@@ -110,9 +106,8 @@ try {
 # Préparer le tableau pour l'export des mots de passe
 $PasswordExport = @()
 
-# ============================================
 # TRAITEMENT DE CHAQUE UTILISATEUR
-# ============================================
+
 foreach ($User in $Users) {
     $Nom = $User.Nom
     $PrenomBrut = $User.Prenom
@@ -201,9 +196,8 @@ foreach ($User in $Users) {
     }
 }
 
-# ============================================
 # EXPORT DES MOTS DE PASSE
-# ============================================
+
 try {
     $PasswordExport | Export-Csv -Path $PasswordExportPath -Delimiter ";" -Encoding UTF8 -NoTypeInformation
     Write-Log "=== Fichier des mots de passe exporté : $PasswordExportPath ===" "SUCCESS"

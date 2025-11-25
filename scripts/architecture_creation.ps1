@@ -1,7 +1,5 @@
+# STRUCTURE AD 
 
-# ============================================
-# SCRIPT : STRUCTURE AD (Version Corrigée)
-# ============================================
 $LogPath = "C:\Scripts\structure_log.txt"
 
 # --- Fonction de Log ---
