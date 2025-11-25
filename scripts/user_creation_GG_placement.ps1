@@ -300,6 +300,7 @@ foreach ($User in $Users) {
             -Department $Departement `
             -Office $Bureau `
             -OfficePhone $NumeroInterne `
+            -IPPhone $NumeroInterne `
             -AccountPassword $SecurePassword `
             -Enabled $true `
             -ChangePasswordAtLogon $false `
