@@ -1,5 +1,3 @@
-# VARIABLES DE CONFIGURATION
-
 $CSVPath = "C:\Scripts\utilisateurs.csv"
 $Domain = "espagne.lan"
 $RootDN = "DC=espagne,DC=lan"
@@ -8,6 +6,41 @@ $PasswordExportPath = "C:\Scripts\passwords_export.csv"
 $LogPath = "C:\Scripts\creation_users_log.txt"
 $PasswordLength = 10
 
+$DepartmentGroupMapping = @{
+    # Direction
+    "Direction" = @("GG_Direction")
+    
+    # Ressources Humaines
+    "Gestion_du_personnelRessources_humaines" = @("GG_RessourcesHumaines", "GG_GestionPersonnel")
+    "RecrutementRessources_humaines" = @("GG_RessourcesHumaines", "GG_Recrutement")
+    
+    # R&D
+    "RechercheRD" = @("GG_RD", "GG_Recherche")
+    "TestingRD" = @("GG_RD", "GG_Testing")
+    
+    # Marketing
+    "Site1Marketting" = @("GG_Marketing", "GG_MarketingSite1")
+    "Site2Marketting" = @("GG_Marketing", "GG_MarketingSite2")
+    "Site3Marketting" = @("GG_Marketing", "GG_MarketingSite3")
+    "Site4Marketting" = @("GG_Marketing", "GG_MarketingSite4")
+    
+    # Finances
+    "ComptabiliteFinances" = @("GG_Finances", "GG_Comptabilite")
+    "InvestissementsFinances" = @("GG_Finances", "GG_Investissements")
+    
+    # Technique
+    "AchatTechnique" = @("GG_Technique", "GG_Achat")
+    "TechniciensTechnique" = @("GG_Technique", "GG_Techniciens")
+    
+    # Informatique
+    "SystemesInformatique" = @("GG_Informatique", "GG_Systemes")
+    "DeveloppementInformatique" = @("GG_Informatique", "GG_Developpement")
+    "HotLineInformatique" = @("GG_Informatique", "GG_HotLine")
+    
+    # Commerciaux
+    "SedentairesCommerciaux" = @("GG_Commerciaux", "GG_Sedentaires")
+    "TechnicoCommerciaux" = @("GG_Commerciaux", "GG_Technico")
+}
 
 $DepartmentOUMapping = @{
     # Direction
@@ -104,7 +137,20 @@ function Convert-PrenomToInitials {
     }
 }
 
-# OBTENIR L'OU DU DEPARTEMENT
+# OBTENIR LES GROUPES DU DEPARTEMENT
+
+function Get-DepartmentGroups {
+    param([string]$Departement)
+    
+    if ($DepartmentGroupMapping.ContainsKey($Departement)) {
+        return $DepartmentGroupMapping[$Departement]
+    } else {
+        Write-Log "  AVERTISSEMENT: Aucun groupe défini pour '$Departement'" "WARNING"
+        return @()
+    }
+}
+
+# OBTENIR L'OU
 
 function Get-DepartmentOU {
     param([string]$Departement)
@@ -119,7 +165,7 @@ function Get-DepartmentOU {
     }
 }
 
-# LOG
+# FONCTION : ECRIRE DANS LE LOG
 
 function Write-Log {
     param(
@@ -173,7 +219,6 @@ $PasswordExport = @()
 $SuccessCount = 0
 $ErrorCount = 0
 $SkipCount = 0
-
 
 # TRAITEMENT DE CHAQUE UTILISATEUR
 
@@ -269,6 +314,24 @@ foreach ($User in $Users) {
         Write-Log "  Utilisateur créé avec succès dans $TargetOU !" "SUCCESS"
         $SuccessCount++
         
+        # Ajouter l'utilisateur aux groupes appropriés
+        $UserGroups = Get-DepartmentGroups -Departement $Departement
+        if ($UserGroups.Count -gt 0) {
+            Write-Log "  Ajout aux groupes..." "INFO"
+            foreach ($GroupName in $UserGroups) {
+                try {
+                    # Vérifier que le groupe existe
+                    $Group = Get-ADGroup -Identity $GroupName -ErrorAction Stop
+                    
+                    # Ajouter l'utilisateur au groupe
+                    Add-ADGroupMember -Identity $GroupName -Members $SamAccountName -ErrorAction Stop
+                    Write-Log "    Ajouté au groupe : $GroupName" "SUCCESS"
+                } catch {
+                    Write-Log "    ERREUR ajout au groupe $GroupName : $_" "ERROR"
+                }
+            }
+        }
+        
         # Ajouter au tableau d'export des mots de passe
         $PasswordExport += [PSCustomObject]@{
             Nom = $Nom
@@ -286,7 +349,6 @@ foreach ($User in $Users) {
     }
 }
 
-
 # EXPORT DES MOTS DE PASSE
 
 try {
@@ -296,8 +358,7 @@ try {
     Write-Log "ERREUR lors de l'export des mots de passe : $_" "ERROR"
 }
 
-
-# Log de fin de script
+# LOG FINAL
 
 Write-Log "========================================" "INFO"
 Write-Log "=== CREATION DES UTILISATEURS TERMINEE ===" "INFO"

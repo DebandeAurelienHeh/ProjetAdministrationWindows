@@ -2,7 +2,7 @@
 
 $LogPath = "C:\Scripts\structure_log.txt"
 
-# --- Fonction de Log ---
+# Fonction de Log 
 function Write-Log {
     param([string]$Message, [string]$Type = "INFO")
     $Msg = "[$(Get-Date -Format 'HH:mm:ss')] [$Type] $Message"
@@ -16,7 +16,7 @@ function Write-Log {
     }
 }
 
-# --- Vérification Admin ---
+# Vérification Admin 
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Log "Ce script doit être lancé en tant qu'administrateur !" "CRITICAL"
@@ -24,9 +24,9 @@ if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Adm
 }
 
 Clear-Host
-Write-Log "=== DEMARRAGE ARCHITECTURE ===" "INFO"
+Write-Log "DEMARRAGE ARCHITECTURE" "INFO"
 
-# --- Import Module Active Directory ---
+# Import Module Active Directory 
 Write-Log "Chargement du module Active Directory..." "INFO"
 try {
     Import-Module ActiveDirectory -ErrorAction Stop
@@ -38,7 +38,7 @@ try {
     exit
 }
 
-# 1. Détection du Domaine
+# Détection du Domaine
 Write-Log "Détection du domaine Active Directory..." "INFO"
 try {
     $Domain = Get-ADDomain -ErrorAction Stop
@@ -52,7 +52,7 @@ try {
     exit
 }
 
-# 2. Création de la Racine "Utilisateurs"
+# Création de la Racine "Utilisateurs"
 $BaseOU_Name = "Utilisateurs"
 $BaseOU_DN = "OU=$BaseOU_Name,$RootDN"
 
@@ -72,7 +72,7 @@ try {
     }
 }
 
-# 3. Fonction pour créer les sous-dossiers
+# Fonction pour créer les sous-dossiers
 function Ensure-OU {
     param(
         [string]$Name, 
@@ -98,8 +98,8 @@ function Ensure-OU {
     return $TargetDN
 }
 
-# 4. Création de l'arborescence
-Write-Log "--- Construction des Départements (Niveau 1) ---" "INFO"
+# Création de l'arborescence
+Write-Log "Construction des Départements" "INFO"
 
 # Niveau 1 - Départements principaux
 $DirectionOU    = Ensure-OU -Name "Direction" -ParentDN $BaseOU_DN
@@ -111,7 +111,7 @@ $TechniqueOU    = Ensure-OU -Name "Technique" -ParentDN $BaseOU_DN
 $InformatiqueOU = Ensure-OU -Name "Informatique" -ParentDN $BaseOU_DN
 $CommerciauxOU  = Ensure-OU -Name "Commerciaux" -ParentDN $BaseOU_DN
 
-Write-Log "--- Construction des Sous-Départements (Niveau 2) ---" "INFO"
+Write-Log "Construction des Sous-Départements" "INFO"
 
 # Niveau 2 - Ressources Humaines
 Write-Log "Sous-départements RH..." "INFO"
@@ -157,11 +157,11 @@ Ensure-OU -Name "ResponsableDepartement" -ParentDN $BaseOU_DN | Out-Null
 Ensure-OU -Name "ResponsableGestion" -ParentDN $BaseOU_DN | Out-Null
 Ensure-OU -Name "ResponsableRecrutement" -ParentDN $BaseOU_DN | Out-Null
 
-Write-Log "=== ARCHITECTURE TERMINEE ===" "SUCCESS"
+Write-Log "ARCHITECTURE TERMINEE" "SUCCESS"
 Write-Log "Consultez le fichier de log pour les détails : $LogPath" "INFO"
 
 # Afficher un résumé
-Write-Host "`n=== RESUME ===" -ForegroundColor Cyan
+Write-Host "`nRESUME" -ForegroundColor Cyan
 try {
     $AllOUs = Get-ADOrganizationalUnit -Filter * -SearchBase $BaseOU_DN | Measure-Object
     Write-Host "Total d'OUs créées sous 'Utilisateurs' : $($AllOUs.Count)" -ForegroundColor Green
