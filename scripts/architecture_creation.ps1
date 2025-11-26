@@ -27,7 +27,7 @@ Clear-Host
 Write-Log "DEMARRAGE ARCHITECTURE" "INFO"
 
 # Import Module Active Directory 
-Write-Log "Chargement du module Active Directory..." "INFO"
+Write-Log "Chargement du module Active Directory" "INFO"
 try {
     Import-Module ActiveDirectory -ErrorAction Stop
     Write-Log "Module Active Directory chargé avec succès" "SUCCESS"
@@ -39,7 +39,7 @@ try {
 }
 
 # Détection du Domaine
-Write-Log "Détection du domaine Active Directory..." "INFO"
+Write-Log "Détection du domaine Active Directory" "INFO"
 try {
     $Domain = Get-ADDomain -ErrorAction Stop
     $RootDN = $Domain.DistinguishedName
@@ -114,12 +114,12 @@ $CommerciauxOU  = Ensure-OU -Name "Commerciaux" -ParentDN $BaseOU_DN
 Write-Log "Construction des Sous-Départements" "INFO"
 
 # Niveau 2 - Ressources Humaines
-Write-Log "Sous-départements RH..." "INFO"
+Write-Log "Sous-départements RH" "INFO"
 Ensure-OU -Name "Gestion du personnel" -ParentDN $RH_OU | Out-Null
 Ensure-OU -Name "Recrutement" -ParentDN $RH_OU | Out-Null
 
 # Niveau 2 - R&D
-Write-Log "Sous-départements R&D..." "INFO"
+Write-Log "Sous-départements R&D" "INFO"
 Ensure-OU -Name "Recherche" -ParentDN $RD_OU | Out-Null
 Ensure-OU -Name "Testing" -ParentDN $RD_OU | Out-Null
 
@@ -131,31 +131,26 @@ Ensure-OU -Name "Site 3" -ParentDN $MarketingOU | Out-Null
 Ensure-OU -Name "Site 4" -ParentDN $MarketingOU | Out-Null
 
 # Niveau 2 - Finances
-Write-Log "Sous-départements Finances..." "INFO"
+Write-Log "Sous-départements Finances" "INFO"
 Ensure-OU -Name "Comptabilité" -ParentDN $FinancesOU | Out-Null
 Ensure-OU -Name "Investissements" -ParentDN $FinancesOU | Out-Null
 
 # Niveau 2 - Technique
-Write-Log "Sous-départements Technique..." "INFO"
+Write-Log "Sous-départements Technique" "INFO"
 Ensure-OU -Name "Techniciens" -ParentDN $TechniqueOU | Out-Null
 Ensure-OU -Name "Achat" -ParentDN $TechniqueOU | Out-Null
 
 # Niveau 2 - Informatique
-Write-Log "Sous-départements Informatique..." "INFO"
+Write-Log "Sous-départements Informatique" "INFO"
 Ensure-OU -Name "Systèmes" -ParentDN $InformatiqueOU | Out-Null
 Ensure-OU -Name "Développement" -ParentDN $InformatiqueOU | Out-Null
 Ensure-OU -Name "HotLine" -ParentDN $InformatiqueOU | Out-Null
 
 # Niveau 2 - Commerciaux
-Write-Log "Sous-départements Commerciaux..." "INFO"
+Write-Log "Sous-départements Commerciaux" "INFO"
 Ensure-OU -Name "Sédentaires" -ParentDN $CommerciauxOU | Out-Null
 Ensure-OU -Name "Technico" -ParentDN $CommerciauxOU | Out-Null
 
-# Dossiers Spéciaux pour Responsables (à la racine Utilisateurs)
-Write-Log "--- Création dossiers Responsables ---" "INFO"
-Ensure-OU -Name "ResponsableDepartement" -ParentDN $BaseOU_DN | Out-Null
-Ensure-OU -Name "ResponsableGestion" -ParentDN $BaseOU_DN | Out-Null
-Ensure-OU -Name "ResponsableRecrutement" -ParentDN $BaseOU_DN | Out-Null
 
 Write-Log "ARCHITECTURE TERMINEE" "SUCCESS"
 Write-Log "Consultez le fichier de log pour les détails : $LogPath" "INFO"

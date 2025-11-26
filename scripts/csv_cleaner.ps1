@@ -1,5 +1,5 @@
 $inputFile  = "Employes.csv"
-$outputFile = "Employes_clean.csv"
+$outputFile = "utilisateurs.csv"
 
 # Fonction pour retirer accents et caractères problématiques
 function Normalize-ADString {
