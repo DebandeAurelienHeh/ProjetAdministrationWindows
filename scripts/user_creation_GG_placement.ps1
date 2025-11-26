@@ -307,7 +307,7 @@ foreach ($User in $Users) {
             -Path $TargetOU `
             -ErrorAction Stop
         
-        # Configurer l'expiration du mot de passe à 30 jours
+        # Considérer que le mot de passe a été changé
         Set-ADUser -Identity $SamAccountName -Replace @{pwdLastSet=0} -ErrorAction Stop
         Set-ADUser -Identity $SamAccountName -Replace @{pwdLastSet=-1} -ErrorAction Stop
         
