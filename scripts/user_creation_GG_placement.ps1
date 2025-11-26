@@ -188,7 +188,7 @@ function Write-Log {
 # DEBUT DU SCRIPT
 
 Clear-Host
-Write-Log "=== DEBUT DE LA CREATION DES UTILISATEURS ===" "INFO"
+Write-Log "DEBUT DE LA CREATION DES UTILISATEURS" "INFO"
 
 # Vérifier que le module Active Directory est chargé
 try {
@@ -230,7 +230,6 @@ foreach ($User in $Users) {
     $NumeroInterne = $User.N_Interne
     $Bureau = $User.Bureau
     
-    Write-Log "========================================" "INFO"
     Write-Log "Traitement de : $PrenomBrut $Nom" "INFO"
     
     # Déterminer l'OU de destination
@@ -361,14 +360,10 @@ try {
 
 # LOG FINAL
 
-Write-Log "========================================" "INFO"
-Write-Log "=== CREATION DES UTILISATEURS TERMINEE ===" "INFO"
+Write-Log "CREATION DES UTILISATEURS TERMINEE" "INFO"
 Write-Log "Total utilisateurs traités : $($Users.Count)" "INFO"
 Write-Log "Utilisateurs créés avec succès : $SuccessCount" "SUCCESS"
 Write-Log "Utilisateurs ignorés (déjà existants) : $SkipCount" "WARNING"
 Write-Log "Erreurs rencontrées : $ErrorCount" "ERROR"
-Write-Log "========================================" "INFO"
 
-# Afficher le résumé dans la console
-Write-Host "`n=== RESUME FINAL ===" -ForegroundColor Cyan
 Write-Host "Traités : $($Users.Count) | Créés : $SuccessCount | Ignorés : $SkipCount | Erreurs : $ErrorCount" -ForegroundColor White
