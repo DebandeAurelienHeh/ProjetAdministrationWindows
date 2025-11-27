@@ -47,3 +47,20 @@ try {
 
 Write-Host ""
 Write-Host "Script exécuté avec succès!" -ForegroundColor Green
+
+
+# Lister les certificats de signature de code disponibles
+$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | 
+        Where-Object {$_.Subject -like "*Administrator*"} | 
+        Select-Object -First 1
+
+# Afficher le certificat
+$cert | Format-List Subject, Issuer, Thumbprint, NotAfter
+
+
+
+# Chemin du script
+$scriptPath = "C:\Scripts\Get-RHUsers.ps1"
+
+# Signer le script
+Set-AuthenticodeSignature -FilePath $scriptPath -Certificate $cert -TimestampServer "http://timestamp.digicert.com"
