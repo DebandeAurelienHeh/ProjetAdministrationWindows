@@ -305,15 +305,17 @@ foreach ($User in $Users) {
         Set-ADUser -Identity $SamAccountName -Replace @{pwdLastSet=-1} -ErrorAction Stop
         
         $LogonHours = New-Object byte[] 21
+
         for ($i = 0; $i -lt 21; $i++) {
             $LogonHours[$i] = 0x00
         }
         for ($day = 0; $day -lt 7; $day++) {
             $baseIndex = $day * 3
-            $LogonHours[$baseIndex] = 0xFC
-            $LogonHours[$baseIndex + 1] = 0x7F
-            $LogonHours[$baseIndex + 2] = 0x00
+            $LogonHours[$baseIndex] = 0xE0 
+            $LogonHours[$baseIndex + 1] = 0xFF 
+            $LogonHours[$baseIndex + 2] = 0x07 
         }
+    
         Set-ADUser -Identity $SamAccountName -Replace @{logonHours=$LogonHours} -ErrorAction Stop
         
         Write-Log "Utilisateur créé avec succès dans $TargetOU !" "SUCCESS"
