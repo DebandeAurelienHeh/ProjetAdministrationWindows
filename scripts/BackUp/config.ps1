@@ -1,5 +1,5 @@
 # Fichier de configuration 
-$NAS_IP = "192.168.1.11"
+$NAS_IP = "10.4.0.3"
 $NAS_SHARE = "\\$NAS_IP\HyperV_BackUp"
 $LogFile = "C:\Scripts\backup_log.txt"
 
