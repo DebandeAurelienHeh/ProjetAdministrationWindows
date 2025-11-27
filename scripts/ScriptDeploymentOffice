@@ -1,0 +1,13 @@
+$RegPath = "HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration"
+
+# Check for the key used by modern C2R installs
+$IsInstalled = Get-ItemProperty -Path $RegPath -Name "ClientVersion" -ErrorAction SilentlyContinue
+
+if ($IsInstalled) {
+    Write-Host "Office $($IsInstalled.ClientVersion) is already installed. Exiting."
+    exit 0
+} else {
+    Write-Host "Starting Office installation..."
+    Start-Process -FilePath "\\SRV-FS01\OfficeDeploy\setup.exe" -ArgumentList "/configure \\PC_MADRID\OfficeDeploy\config.xml" -Wait
+    exit 0
+}
