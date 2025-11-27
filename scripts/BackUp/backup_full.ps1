@@ -7,6 +7,11 @@ if (-not (Connect-Nas)) {
     exit
 }
 
+$FullPath = "$NAS_SHARE\Full"
+if (-not (Test-Path $FullPath)) {
+    New-Item -ItemType Directory -Path $FullPath -Force | Out-Null
+}
+
 if (-not (Test-Path $NAS_SHARE)) {
     Log-Write "ERREUR CRITIQUE : Le NAS $NAS_SHARE est inaccessible. Abandon."
     exit
