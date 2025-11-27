@@ -5,6 +5,7 @@ $BaseOU = "OU=Utilisateurs,$RootDN"
 $PasswordExportPath = "C:\Scripts\passwords_export.csv"
 $LogPath = "C:\Scripts\creation_users_log.txt"
 $PasswordLength = 10
+$DirecteurPasswordLength = 15
 
 $DepartmentGroupMapping = @{
     # Direction
@@ -90,8 +91,6 @@ $DepartmentOUMapping = @{
     "ResponsableRecrutement" = "OU=ResponsableRecrutement,$BaseOU"
 }
 
-# GENERATION MOT DE PASSE 
-
 function Generate-ComplexPassword {
     param([int]$Length = 10)
     
@@ -119,8 +118,6 @@ function Generate-ComplexPassword {
     return -join $Password
 }
 
-# CONVERTIR PRENOM EN INITIALES
-
 function Convert-PrenomToInitials {
     param([string]$Prenom)
     
@@ -137,20 +134,16 @@ function Convert-PrenomToInitials {
     }
 }
 
-# OBTENIR LES GROUPES DU DEPARTEMENT
-
 function Get-DepartmentGroups {
     param([string]$Departement)
     
     if ($DepartmentGroupMapping.ContainsKey($Departement)) {
         return $DepartmentGroupMapping[$Departement]
     } else {
-        Write-Log "  AVERTISSEMENT: Aucun groupe défini pour '$Departement'" "WARNING"
+        Write-Log "AVERTISSEMENT: Aucun groupe défini pour '$Departement'" "WARNING"
         return @()
     }
 }
-
-# OBTENIR L'OU
 
 function Get-DepartmentOU {
     param([string]$Departement)
@@ -159,13 +152,11 @@ function Get-DepartmentOU {
         return $DepartmentOUMapping[$Departement]
     } else {
         # Si le département n'est pas trouvé, utiliser l'OU de base
-        Write-Log "  AVERTISSEMENT: Département '$Departement' non trouvé dans la table de correspondance" "WARNING"
-        Write-Log "  L'utilisateur sera placé dans l'OU de base : $BaseOU" "WARNING"
+        Write-Log "AVERTISSEMENT: Département '$Departement' non trouvé dans la table de correspondance" "WARNING"
+        Write-Log "L'utilisateur sera placé dans l'OU de base : $BaseOU" "WARNING"
         return $BaseOU
     }
 }
-
-# FONCTION : ECRIRE DANS LE LOG
 
 function Write-Log {
     param(
@@ -185,10 +176,6 @@ function Write-Log {
     }
 }
 
-# DEBUT DU SCRIPT
-
-Clear-Host
-Write-Log "DEBUT DE LA CREATION DES UTILISATEURS" "INFO"
 
 # Vérifier que le module Active Directory est chargé
 try {
@@ -220,7 +207,7 @@ $SuccessCount = 0
 $ErrorCount = 0
 $SkipCount = 0
 
-# TRAITEMENT DE CHAQUE UTILISATEUR
+# Traiter chaque utilisateur
 
 foreach ($User in $Users) {
     $Nom = $User.Nom
@@ -234,19 +221,19 @@ foreach ($User in $Users) {
     
     # Déterminer l'OU de destination
     $TargetOU = Get-DepartmentOU -Departement $Departement
-    Write-Log "  OU de destination : $TargetOU" "INFO"
+    Write-Log "OU de destination : $TargetOU" "INFO"
     
     # Vérifier que l'OU existe
     try {
         $OUExists = Get-ADOrganizationalUnit -Identity $TargetOU -ErrorAction Stop
     } catch {
-        Write-Log "  ERREUR: L'OU '$TargetOU' n'existe pas !" "ERROR"
-        Write-Log "  Veuillez créer la structure AD avant de créer les utilisateurs" "ERROR"
+        Write-Log "ERREUR: L'OU '$TargetOU' n'existe pas !" "ERROR"
+        Write-Log "Veuillez créer la structure AD avant de créer les utilisateurs" "ERROR"
         $ErrorCount++
         continue
     }
     
-    # Générer le login (SamAccountName)
+    # Générer le login 
     $PrenomInitiales = Convert-PrenomToInitials -Prenom $PrenomBrut
     $NomLower = $Nom.ToLower()
     $SamAccountName = "$PrenomInitiales.$NomLower"
@@ -256,31 +243,38 @@ foreach ($User in $Users) {
     $DisplayName = "$PrenomDisplay $Nom"
     
     # Générer l'email
-    $Email = "$SamAccountName@$Departement.es"
+    $Email = "$SamAccountName@$Domain"
     
     # Générer l'UPN
     $UPN = "$SamAccountName@$Domain"
     
+    # Changer la longueur du mot de passe si directeur
+    if ($Departement -eq "Direction") {
+        $PasswordLengthToUse = $DirecteurPasswordLength
+    } else {
+        $PasswordLengthToUse = $PasswordLength
+    }
+    
     # Générer le mot de passe
-    $Password = Generate-ComplexPassword -Length $PasswordLength
+    $Password = Generate-ComplexPassword -Length $PasswordLengthToUse
     $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force
     
-    Write-Log "  Login: $SamAccountName" "INFO"
-    Write-Log "  DisplayName: $DisplayName" "INFO"
-    Write-Log "  Email: $Email" "INFO"
-    Write-Log "  UPN: $UPN" "INFO"
-    Write-Log "  Département: $Departement" "INFO"
+    Write-Log "Login: $SamAccountName" "INFO"
+    Write-Log "DisplayName: $DisplayName" "INFO"
+    Write-Log "Email: $Email" "INFO"
+    Write-Log "UPN: $UPN" "INFO"
+    Write-Log "Département: $Departement" "INFO"
     
     # Vérifier si l'utilisateur existe déjà
     try {
         $ExistingUser = Get-ADUser -Filter "SamAccountName -eq '$SamAccountName'" -ErrorAction SilentlyContinue
         if ($ExistingUser) {
-            Write-Log "  ATTENTION: L'utilisateur $SamAccountName existe déjà - ignoré" "WARNING"
+            Write-Log "ATTENTION: L'utilisateur $SamAccountName existe déjà - ignoré" "WARNING"
             $SkipCount++
             continue
         }
     } catch {
-        Write-Log "  Erreur lors de la vérification de l'existence de l'utilisateur - $_" "ERROR"
+        Write-Log "Erreur lors de la vérification de l'existence de l'utilisateur - $_" "ERROR"
         $ErrorCount++
         continue
     }
@@ -307,17 +301,16 @@ foreach ($User in $Users) {
             -Path $TargetOU `
             -ErrorAction Stop
         
-        # Considérer que le mot de passe a été changé
         Set-ADUser -Identity $SamAccountName -Replace @{pwdLastSet=0} -ErrorAction Stop
         Set-ADUser -Identity $SamAccountName -Replace @{pwdLastSet=-1} -ErrorAction Stop
         
-        Write-Log "  Utilisateur créé avec succès dans $TargetOU !" "SUCCESS"
+        Write-Log "Utilisateur créé avec succès dans $TargetOU !" "SUCCESS"
         $SuccessCount++
         
         # Ajouter l'utilisateur aux groupes appropriés
         $UserGroups = Get-DepartmentGroups -Departement $Departement
         if ($UserGroups.Count -gt 0) {
-            Write-Log "  Ajout aux groupes..." "INFO"
+            Write-Log "  Ajout aux groupes" "INFO"
             foreach ($GroupName in $UserGroups) {
                 try {
                     # Vérifier que le groupe existe
@@ -325,9 +318,9 @@ foreach ($User in $Users) {
                     
                     # Ajouter l'utilisateur au groupe
                     Add-ADGroupMember -Identity $GroupName -Members $SamAccountName -ErrorAction Stop
-                    Write-Log "    Ajouté au groupe : $GroupName" "SUCCESS"
+                    Write-Log "Ajouté au groupe : $GroupName" "SUCCESS"
                 } catch {
-                    Write-Log "    ERREUR ajout au groupe $GroupName : $_" "ERROR"
+                    Write-Log "ERREUR ajout au groupe $GroupName : $_" "ERROR"
                 }
             }
         }
@@ -344,21 +337,18 @@ foreach ($User in $Users) {
         }
         
     } catch {
-        Write-Log "  ERREUR lors de la création de l'utilisateur : $_" "ERROR"
+        Write-Log "ERREUR lors de la création de l'utilisateur : $_" "ERROR"
         $ErrorCount++
     }
 }
 
-# EXPORT DES MOTS DE PASSE
-
+# Export des MDP
 try {
     $PasswordExport | Export-Csv -Path $PasswordExportPath -Delimiter ";" -Encoding UTF8 -NoTypeInformation
-    Write-Log "=== Fichier des mots de passe exporté : $PasswordExportPath ===" "SUCCESS"
+    Write-Log "Fichier des mots de passe exporté : $PasswordExportPath" "SUCCESS"
 } catch {
     Write-Log "ERREUR lors de l'export des mots de passe : $_" "ERROR"
 }
-
-# LOG FINAL
 
 Write-Log "CREATION DES UTILISATEURS TERMINEE" "INFO"
 Write-Log "Total utilisateurs traités : $($Users.Count)" "INFO"
@@ -366,4 +356,5 @@ Write-Log "Utilisateurs créés avec succès : $SuccessCount" "SUCCESS"
 Write-Log "Utilisateurs ignorés (déjà existants) : $SkipCount" "WARNING"
 Write-Log "Erreurs rencontrées : $ErrorCount" "ERROR"
 
+Write-Host "`nRESUME FINAL" -ForegroundColor Cyan
 Write-Host "Traités : $($Users.Count) | Créés : $SuccessCount | Ignorés : $SkipCount | Erreurs : $ErrorCount" -ForegroundColor White
