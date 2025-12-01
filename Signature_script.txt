@@ -1,0 +1,29 @@
+# Récupérer ton certificat de signature de code
+$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+
+# Vérifier qu'il est bien présent
+$cert | Format-List Subject, Thumbprint, NotAfter
+```
+
+**Résultat attendu :**
+```
+Subject    : CN=Administrator, ...
+Thumbprint : A1B2C3D4E5F6...
+NotAfter   : 12/01/2026 ...
+
+
+
+________________________________________________________________________________
+
+# Chemin de ton script à signer
+$scriptPath = "C:\chemin\vers\ton\script.ps1"
+
+# Signer le script
+Set-AuthenticodeSignature -FilePath $scriptPath -Certificate $cert -TimestampServer "http://timestamp.digicert.com"
+```
+
+**Résultat attendu :**
+```
+SignerCertificate      Status     Path
+-----------------      ------     ----
+A1B2C3D4E5F6...        Valid      script.ps1
