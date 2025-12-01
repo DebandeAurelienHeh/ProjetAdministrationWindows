@@ -1,0 +1,406 @@
+! Stack Manager :
+! Chassis :
+system name SwitchEspagne
+system contact aurelien.rousche@std.heh.be
+system location Espagne
+system timezone CET
+system daylight savings time enable
+! Configuration:
+! VLAN :
+vlan 1 enable name "VLAN 1"
+vlan 10 enable name "Madrid"
+vlan 10 port default 1/1
+vlan 10 port default 1/2
+vlan 10 port default 1/3
+vlan 10 port default 1/4
+vlan 10 port default 1/5
+vlan 20 enable name "Barcelone"
+vlan 20 port default 1/11
+vlan 20 port default 1/12
+vlan 20 port default 1/13
+vlan 20 port default 1/14
+vlan 20 port default 1/15
+vlan 110 enable name "MadridVoix"
+vlan 110 port default 1/6
+vlan 110 port default 1/7
+vlan 110 port default 1/8
+vlan 110 port default 1/9
+vlan 110 port default 1/10
+vlan 120 enable name "BarceloneVoix"
+vlan 120 port default 1/16
+vlan 120 port default 1/17
+vlan 120 port default 1/18
+vlan 120 port default 1/19
+vlan 120 port default 1/20
+vlan 200 enable name "Gestion"
+vlan 200 port default 1/24
+! VLAN SL:
+! IP :
+ip service ftp
+ip service ssh
+no ip service telnet
+ip service udp-relay
+ip service http
+ip service network-time
+ip service snmp
+ip service secure-http
+ip interface "ssh" address 10.10.0.2 mask 255.255.255.0 ifindex 1
+ip interface "Madrid" address 10.4.0.1 mask 255.255.254.0 vlan 10 ifindex 2
+ip interface "Barcelone" address 10.4.4.1 mask 255.255.254.0 vlan 20 ifindex 3
+ip interface "MadridVoix" address 10.4.2.1 mask 255.255.254.0 vlan 110 ifindex 4
+ip interface "BarceloneVoix" address 10.4.6.1 mask 255.255.254.0 vlan 120 ifinde                                                                             x 5
+ip interface "Gestion" address 10.10.10.10 mask 255.255.255.0 vlan 200 ifindex 6
+ip interface "Seville" address 10.5.0.1 mask 255.255.254.0 vlan 30 ifindex 7
+! IPMS :
+! AAA :
+aaa authentication console "local"
+aaa authentication ssh "local"
+! PARTM :
+! 802.1x :
+! QOS :
+! Policy manager :
+! Session manager :
+session banner cli banner.txt
+session prompt default system-name
+session login-timeout 20
+session login-attempt 5
+! SNMP :
+! RIP :
+! IPv6 :
+! IP multicast :
+! IPRM :
+ip router router-id 10.4.0.1
+! RIPng :
+! Health monitor :
+health threshold memory      90
+health threshold temperature 78
+! Interface :
+interfaces 1/21 admin down
+interfaces 1/22 admin down
+interfaces 1/23 admin down
+interfaces 1/25 admin down
+interfaces 1/26 admin down
+interfaces 1/27 admin down
+interfaces 1/28 admin down
+! Udld :
+! Port Mapping :
+! Link Aggregate :
+! VLAN AGG:
+! 802.1Q :
+! Spanning tree :
+bridge mode 1x1
+! Bridging :
+! Bridging :
+port-security 1/1 admin-status enable
+port-security 1/1 maximum 5
+port-security 1/2 admin-status enable
+port-security 1/2 maximum 5
+port-security 1/3 admin-status enable
+port-security 1/3 maximum 5
+port-security 1/4 admin-status enable
+port-security 1/4 maximum 5
+port-security 1/5 admin-status enable
+port-security 1/5 maximum 5
+port-security 1/6 admin-status enable
+port-security 1/6 maximum 5
+port-security 1/7 admin-status enable
+port-security 1/7 maximum 5
+port-security 1/8 admin-status enable
+port-security 1/8 maximum 5
+port-security 1/9 admin-status enable
+port-security 1/9 maximum 5
+port-security 1/10 admin-status enable
+port-security 1/10 maximum 5
+port-security 1/11 admin-status enable
+port-security 1/11 maximum 5
+port-security 1/12 admin-status enable
+port-security 1/12 maximum 5
+port-security 1/13 admin-status enable
+port-security 1/13 maximum 5
+port-security 1/14 admin-status enable
+port-security 1/14 maximum 5
+port-security 1/15 admin-status enable
+port-security 1/15 maximum 5
+port-security 1/16 admin-status enable
+port-security 1/16 maximum 5
+port-security 1/17 admin-status enable
+port-security 1/17 maximum 5
+port-security 1/18 admin-status enable
+port-security 1/18 maximum 5
+port-security 1/19 admin-status enable
+port-security 1/19 maximum 5
+port-security 1/20 admin-status enable
+port-security 1/20 maximum 5
+port-security 1/21 admin-status enable
+port-security 1/21 maximum 5
+port-security 1/22 admin-status enable
+port-security 1/22 maximum 5
+port-security 1/23 admin-status enable
+port-security 1/23 maximum 5
+! Port mirroring :
+! UDP Relay :
+ip helper per-vlan only
+ip helper address 10.4.0.2 vlan 10
+ip helper address 10.4.0.2 vlan 20
+ip helper address 10.4.0.2 vlan 110
+ip helper address 10.4.0.2 vlan 120
+ip helper address 10.4.4.2 vlan 10
+ip helper address 10.4.4.2 vlan 20
+ip helper address 10.4.4.2 vlan 110
+ip helper address 10.4.4.2 vlan 120
+ip helper dhcp-snooping enable
+ip helper dhcp-snooping binding enable
+ip helper dhcp-snooping port 1/1 trust
+ip helper dhcp-snooping ip-source-filter port 1/2 enable
+ip helper dhcp-snooping ip-source-filter port 1/3 enable
+ip helper dhcp-snooping ip-source-filter port 1/4 enable
+ip helper dhcp-snooping ip-source-filter port 1/5 enable
+ip helper dhcp-snooping ip-source-filter port 1/6 enable
+ip helper dhcp-snooping ip-source-filter port 1/7 enable
+ip helper dhcp-snooping ip-source-filter port 1/8 enable
+ip helper dhcp-snooping ip-source-filter port 1/9 enable
+ip helper dhcp-snooping ip-source-filter port 1/10 enable
+ip helper dhcp-snooping port 1/11 trust
+ip helper dhcp-snooping ip-source-filter port 1/12 enable
+ip helper dhcp-snooping ip-source-filter port 1/13 enable
+ip helper dhcp-snooping ip-source-filter port 1/14 enable
+ip helper dhcp-snooping ip-source-filter port 1/15 enable
+ip helper dhcp-snooping ip-source-filter port 1/16 enable
+ip helper dhcp-snooping ip-source-filter port 1/17 enable
+ip helper dhcp-snooping ip-source-filter port 1/18 enable
+ip helper dhcp-snooping ip-source-filter port 1/19 enable
+ip helper dhcp-snooping ip-source-filter port 1/20 enable
+ip helper dhcp-snooping ip-source-filter port 1/21 enable
+ip helper dhcp-snooping ip-source-filter port 1/22 enable
+ip helper dhcp-snooping ip-source-filter port 1/23 enable
+ip helper dhcp-snooping port 1/24 trust
+! System service :
+swlog console level info
+! SSH :
+! Web :
+! AMAP :
+! Lan  Power :
+! NTP :
+ntp server 10.4.0.2 key 0 version 4 minpoll 6 prefer
+ntp client enable
+! RDP :
+! VLAN STACKING:
+! EFM-OAM :
+! SAA :
+! Loopback-detection :
+! ERP :
+! TEST-OAM :
+! Link-fault-propagation :
+! DHL :
+! LLDP :
+! DHCP Server :
+! Stack Split-Protection Helper :
+! Openflow :
+! DHCPv6 :
+! TWAMP :
+! CLOUD-AGENT :
+SwitchEspagne show configuration snapshot
+! Stack Manager :
+! Chassis :
+system name SwitchEspagne
+system contact aurelien.rousche@std.heh.be
+system location Espagne
+system timezone CET
+system daylight savings time enable
+! Configuration:
+! VLAN :
+vlan 1 enable name "VLAN 1"
+vlan 10 enable name "Madrid"
+vlan 10 port default 1/1
+vlan 10 port default 1/2
+vlan 10 port default 1/3
+vlan 10 port default 1/4
+vlan 10 port default 1/5
+vlan 20 enable name "Barcelone"
+vlan 20 port default 1/11
+vlan 20 port default 1/12
+vlan 20 port default 1/13
+vlan 20 port default 1/14
+vlan 20 port default 1/15
+vlan 30 enable name "Seville"
+vlan 30 port default 1/21
+vlan 30 port default 1/22
+vlan 110 enable name "MadridVoix"
+vlan 110 port default 1/6
+vlan 110 port default 1/7
+vlan 110 port default 1/8
+vlan 110 port default 1/9
+vlan 110 port default 1/10
+vlan 120 enable name "BarceloneVoix"
+vlan 120 port default 1/16
+vlan 120 port default 1/17
+vlan 120 port default 1/18
+vlan 120 port default 1/19
+vlan 120 port default 1/20
+vlan 200 enable name "Gestion"
+vlan 200 port default 1/24
+! VLAN SL:
+! IP :
+ip service ftp
+ip service ssh
+no ip service telnet
+ip service udp-relay
+ip service http
+ip service network-time
+ip service snmp
+ip service secure-http
+ip interface "ssh" address 10.10.0.2 mask 255.255.255.0 ifindex 1
+ip interface "Madrid" address 10.4.0.1 mask 255.255.254.0 vlan 10 ifindex 2
+ip interface "Barcelone" address 10.4.4.1 mask 255.255.254.0 vlan 20 ifindex 3
+ip interface "MadridVoix" address 10.4.2.1 mask 255.255.254.0 vlan 110 ifindex 4
+ip interface "BarceloneVoix" address 10.4.6.1 mask 255.255.254.0 vlan 120 ifinde                                                                             x 5
+ip interface "Gestion" address 10.10.10.10 mask 255.255.255.0 vlan 200 ifindex 6
+ip interface "Seville" address 10.5.0.1 mask 255.255.254.0 vlan 30 ifindex 7
+! IPMS :
+! AAA :
+aaa authentication console "local"
+aaa authentication ssh "local"
+! PARTM :
+! 802.1x :
+! QOS :
+! Policy manager :
+! Session manager :
+session banner cli banner.txt
+session prompt default system-name
+session login-timeout 20
+session login-attempt 5
+! SNMP :
+! RIP :
+! IPv6 :
+! IP multicast :
+! IPRM :
+ip router router-id 10.4.0.1
+! RIPng :
+! Health monitor :
+health threshold memory      90
+health threshold temperature 78
+! Interface :
+interfaces 1/23 admin down
+interfaces 1/25 admin down
+interfaces 1/26 admin down
+interfaces 1/27 admin down
+interfaces 1/28 admin down
+! Udld :
+! Port Mapping :
+! Link Aggregate :
+! VLAN AGG:
+! 802.1Q :
+! Spanning tree :
+bridge mode 1x1
+! Bridging :
+! Bridging :
+port-security 1/1 admin-status enable
+port-security 1/1 maximum 5
+port-security 1/2 admin-status enable
+port-security 1/2 maximum 5
+port-security 1/3 admin-status enable
+port-security 1/3 maximum 5
+port-security 1/4 admin-status enable
+port-security 1/4 maximum 5
+port-security 1/5 admin-status enable
+port-security 1/5 maximum 5
+port-security 1/6 admin-status enable
+port-security 1/6 maximum 5
+port-security 1/7 admin-status enable
+port-security 1/7 maximum 5
+port-security 1/8 admin-status enable
+port-security 1/8 maximum 5
+port-security 1/9 admin-status enable
+port-security 1/9 maximum 5
+port-security 1/10 admin-status enable
+port-security 1/10 maximum 5
+port-security 1/11 admin-status enable
+port-security 1/11 maximum 5
+port-security 1/12 admin-status enable
+port-security 1/12 maximum 5
+port-security 1/13 admin-status enable
+port-security 1/13 maximum 5
+port-security 1/14 admin-status enable
+port-security 1/14 maximum 5
+port-security 1/15 admin-status enable
+port-security 1/15 maximum 5
+port-security 1/16 admin-status enable
+port-security 1/16 maximum 5
+port-security 1/17 admin-status enable
+port-security 1/17 maximum 5
+port-security 1/18 admin-status enable
+port-security 1/18 maximum 5
+port-security 1/19 admin-status enable
+port-security 1/19 maximum 5
+port-security 1/20 admin-status enable
+port-security 1/20 maximum 5
+port-security 1/21 admin-status enable
+port-security 1/21 maximum 5
+port-security 1/22 admin-status enable
+port-security 1/22 maximum 5
+port-security 1/23 admin-status enable
+port-security 1/23 maximum 5
+! Port mirroring :
+! UDP Relay :
+ip helper per-vlan only
+ip helper address 10.4.0.2 vlan 10
+ip helper address 10.4.0.2 vlan 20
+ip helper address 10.4.0.2 vlan 30
+ip helper address 10.4.0.2 vlan 110
+ip helper address 10.4.0.2 vlan 120
+ip helper address 10.4.4.2 vlan 10
+ip helper address 10.4.4.2 vlan 20
+ip helper address 10.4.4.2 vlan 30
+ip helper address 10.4.4.2 vlan 110
+ip helper address 10.4.4.2 vlan 120
+ip helper dhcp-snooping enable
+ip helper dhcp-snooping binding enable
+ip helper dhcp-snooping port 1/1 trust
+ip helper dhcp-snooping ip-source-filter port 1/2 enable
+ip helper dhcp-snooping ip-source-filter port 1/3 enable
+ip helper dhcp-snooping ip-source-filter port 1/4 enable
+ip helper dhcp-snooping ip-source-filter port 1/5 enable
+ip helper dhcp-snooping ip-source-filter port 1/6 enable
+ip helper dhcp-snooping ip-source-filter port 1/7 enable
+ip helper dhcp-snooping ip-source-filter port 1/8 enable
+ip helper dhcp-snooping ip-source-filter port 1/9 enable
+ip helper dhcp-snooping ip-source-filter port 1/10 enable
+ip helper dhcp-snooping port 1/11 trust
+ip helper dhcp-snooping ip-source-filter port 1/12 enable
+ip helper dhcp-snooping ip-source-filter port 1/13 enable
+ip helper dhcp-snooping ip-source-filter port 1/14 enable
+ip helper dhcp-snooping ip-source-filter port 1/15 enable
+ip helper dhcp-snooping ip-source-filter port 1/16 enable
+ip helper dhcp-snooping ip-source-filter port 1/17 enable
+ip helper dhcp-snooping ip-source-filter port 1/18 enable
+ip helper dhcp-snooping ip-source-filter port 1/19 enable
+ip helper dhcp-snooping ip-source-filter port 1/20 enable
+ip helper dhcp-snooping port 1/21 trust
+ip helper dhcp-snooping ip-source-filter port 1/22 enable
+ip helper dhcp-snooping ip-source-filter port 1/23 enable
+ip helper dhcp-snooping ip-source-filter port 1/24 enable
+! System service :
+swlog console level info
+! SSH :
+! Web :
+! AMAP :
+! Lan  Power :
+! NTP :
+ntp server 10.4.0.2 key 0 version 4 minpoll 6 prefer
+ntp client enable
+! RDP :
+! VLAN STACKING:
+! EFM-OAM :
+! SAA :
+! Loopback-detection :
+! ERP :
+! TEST-OAM :
+! Link-fault-propagation :
+! DHL :
+! LLDP :
+! DHCP Server :
+! Stack Split-Protection Helper :
+! Openflow :
+! DHCPv6 :
+! TWAMP :
+! CLOUD-AGENT :
